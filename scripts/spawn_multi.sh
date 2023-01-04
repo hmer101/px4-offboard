@@ -51,8 +51,16 @@ function generate_spawn_points() {
 
 # Spawns drones using defined spawn points
 function spawn_drones() {
-	for (( i=0;i<$NUM_DRONES;i++ )); do
-		PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[$i]},${SPAWN_PTS_Y[$i]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i $i
+	# Spawn first drone
+	gnome-terminal --tab -- bash -c "PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[0]},${SPAWN_PTS_Y[0]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4"
+	sleep 5
+
+	# Spawn remaining drones
+	for (( i=1;i<$NUM_DRONES;i++ )); do
+		#echo "spawn drone: $i"
+		#gnome-terminal --tab
+		#gnome-terminal --tab -- bash -c "echo spawn drone: $i; exec bash"
+		gnome-terminal --tab -- bash -c "PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[$i]},${SPAWN_PTS_Y[$i]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i $i"
 	done
 }
 
@@ -61,6 +69,7 @@ function spawn_drones() {
 cleanup
 generate_spawn_points
 spawn_drones
+#cleanup
 
 #"$@"
 #exec "$SHELL"

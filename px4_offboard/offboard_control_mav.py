@@ -70,7 +70,6 @@ async def mission_start(drone):
 
     # Get drone to take off
     print("-- Taking off")
-    await drone.action.set_takeoff_altitude(2)
     await drone.action.takeoff()
 
     # Wait until takeoff complete
@@ -124,7 +123,7 @@ async def mission_offboard(drone):
     
     print("-- At desired position")
     await asyncio.sleep(5)
-    print("COMPLETE: offboard routine \n")
+    print("COMPLETE: Offboard routine \n")
 
 
 
@@ -138,7 +137,6 @@ async def mission_end(drone):
 
     # Return to home and land
     print("-- Returning to home")
-    await drone.action.set_return_to_launch_altitude(5)
     await drone.action.return_to_launch()
 
     # Only disarm once landed
@@ -150,13 +148,37 @@ async def mission_end(drone):
 
     print("COMPLETE: Landing routine \n")
 
+
+# Set drone PX4 parameters
+async def set_params(drone, takeoff_alt_set=2, rtl_alt_set=5):
+    print("STARTING: Setting parameters")
+
+    # Send setting commands
+    await drone.action.set_takeoff_altitude(takeoff_alt_set)
+    await drone.action.set_return_to_launch_altitude(rtl_alt_set)
+
+    # Wait for settings to be set at the correct values
+    takeoff_alt = await drone.action.get_takeoff_altitude()
+    rtl_alt = await drone.action.get_return_to_launch_altitude()
+
+    while takeoff_alt != takeoff_alt_set or  rtl_alt != rtl_alt_set:
+        takeoff_alt = await drone.action.get_takeoff_altitude()
+        rtl_alt = await drone.action.get_return_to_launch_altitude()
+
+    print("COMPLETE: Setting parameters \n")
+
 # Run offboard control mission using MavLink
 async def run_mavlink():
     # Connect to drone via MAVLINK
     drone = System()
-    system_address="udp://:14540"
+    system_address="udp://:14545" #14540
+    print(f'\nSystem address: {system_address} \n')
+
     await drone.connect(system_address)
     await wait_for_drone(drone)
+
+    # Set drone parameters to default values
+    await set_params(drone)
 
     # Start mission (maybe replace entirely with offboard later - for multi-drone co-ordination)
     await mission_start(drone)

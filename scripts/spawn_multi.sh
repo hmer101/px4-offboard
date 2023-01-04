@@ -50,13 +50,13 @@ function generate_spawn_points() {
 function spawn_drones() {
 	# Spawn all drones
 	for (( i=0;i<$NUM_DRONES;i++ )); do
-		gnome-terminal --tab -- bash -c "PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[$i]},${SPAWN_PTS_Y[$i]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i $i"
-		
 		# Wait longer for first drone as Gazebo takes time to start
 		if [ $i == 0 ]; then
-			sleep 2
+			PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[$i]},${SPAWN_PTS_Y[$i]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i $i
+			sleep 10 #If Gazebo already started, works with 2
 		else
-			sleep 0.5
+			gnome-terminal --tab -- bash -c "PX4_SYS_AUTOSTART=$PX4_SYS_AUTOSTART PX4_GZ_MODEL_POSE="${SPAWN_PTS_X[$i]},${SPAWN_PTS_Y[$i]}" PX4_GZ_MODEL=$PX4_GZ_MODEL ~/repos/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i $i"
+			sleep 5 #If Gazebo already started, works with 0.5
 		fi
 
 	done

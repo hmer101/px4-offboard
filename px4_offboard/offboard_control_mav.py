@@ -17,17 +17,15 @@ async def main(config):
         drone_new = await Drone.create(system_address=f"udp://:{UDP_NUM_START+i}", port=(50050+i))
         drones_list.append(drone_new)
 
-    # Fly drones - hardcoded
-    for drone in drones_list:
-        await drone.run_hardcoded_mavlink()
+    # Fly drones simulatenously - hardcoded
+    drones_fly_coroutines = []
 
-    # Get drones to work simultaneously (only for this temporary script as each will have its own terminal)
-    #await asyncio.sleep(30)
+    for count, drone in enumerate(drones_list):
+        drones_fly_coroutines.append(asyncio.ensure_future(drone.run_hardcoded_mavlink()))
 
-    # # Wait until takeoff complete
-    # async for current_flight_mode in drone_system_0.telemetry.flight_mode(): 
-    #     if current_flight_mode == telemetry.FlightMode.HOLD:
-    #         break
+    # Wait for all drones to be finished
+    for drone_fly_couroutine in drones_fly_coroutines:
+        await drone_fly_couroutine
 
 
 # Ensure multiple mavsdk_servers are running first, using e.g. ./multi_mavsdk_server.sh -n 3

@@ -13,6 +13,7 @@ class Drone:
     @classmethod
     async def create(cls, system_address="udp://:14540", port=50050, mavsdk_server_address="localhost"):
         self = Drone()
+        #self.drone_id = 
 
         # Connect to drone via MAVLINK through UDP
         self.drone_system = System(mavsdk_server_address=mavsdk_server_address, port=port)
